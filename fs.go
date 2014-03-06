@@ -1,8 +1,11 @@
-package php
+package goutils
 
 import(
  "os"
  "io/ioutil"
+)
+const(
+	FILE_APPEND=1
 )
 
 func File_get_contents(file_path string)(data []byte,err error){

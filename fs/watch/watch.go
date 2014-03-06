@@ -9,16 +9,15 @@ import (
         "os"
         "path/filepath"
         "fmt"
-        "github.com/koyachi/go-term-ansicolor/ansicolor"
 )
 
 func debugMessage(format string, a ...interface{}) {
         msg := fmt.Sprintf(format, a...)
-        fmt.Println(ansicolor.IntenseBlack(msg))
+        fmt.Println(msg)
 }
 
 func debugError(msg error) {
-        fmt.Println(ansicolor.IntenseBlack(msg.Error()))
+        fmt.Println(msg.Error())
 }
 
 //type FileNotifyEvent fsnotify.FileEvent

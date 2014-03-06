@@ -1,4 +1,4 @@
-package maputil
+package goutils
 import (
   "fmt"
   "testing"

@@ -1,4 +1,4 @@
-package maputil
+package goutils
 import (
   "strings"
   "strconv"
@@ -9,12 +9,12 @@ type myMap struct{
     paths []string
 }
 
-func NewWalker(m map[string]interface{}) * myMap{
+func NewMapWalker(m map[string]interface{}) * myMap{
   return &myMap{configs:m,paths:[]string{}}
 }
 
-func (myConf *myMap)Gointo(name string){
-    path_num:=len(myConf.paths)
+func (myMap *myMap)Gointo(name string){
+    path_num:=len(myMap.paths)
     if(len(name)>1){
        name=strings.TrimRight(name,"/")
      }
@@ -22,29 +22,29 @@ func (myConf *myMap)Gointo(name string){
         return
       }
     if(name=="/"){
-       myConf.paths=[]string{}
+       myMap.paths=[]string{}
      }else  if(name==".."){
         if(path_num>0){
-          myConf.paths=myConf.paths[0:path_num-1]
+          myMap.paths=myMap.paths[0:path_num-1]
            }
     }else if(strings.Contains(name,"/")){
 	       if(name[0]=='/'){
-	          myConf.paths=[]string{}
+	          myMap.paths=[]string{}
 	         }
 	       subNames:=strings.Split(name,"/")
 	       for _,v:=range subNames{
-	          myConf.Gointo(v)
+	          myMap.Gointo(v)
 	        }
      }else{
-         myConf.paths=append(myConf.paths,name)
+         myMap.paths=append(myMap.paths,name)
        }
 }
 
 /*
 *读取指定项的值
 */
-func (myConf *myMap)GetString(name string,def ...string) string{
-   val:=myConf.Get(name)
+func (myMap *myMap)GetString(name string,def ...string) string{
+   val:=myMap.Get(name)
    switch val.(type){
       case string, float64, bool:
          return fmt.Sprint(val)
@@ -56,8 +56,8 @@ func (myConf *myMap)GetString(name string,def ...string) string{
    }
 }
 
-func (myConf *myMap)GetStringArray(name string,def ...[]string) []string{
-   val:=myConf.Get(name)
+func (myMap *myMap)GetStringArray(name string,def ...[]string) []string{
+   val:=myMap.Get(name)
    var defVal []string
    if(len(def)>0){
       defVal=def[0]
@@ -81,25 +81,25 @@ func (myConf *myMap)GetStringArray(name string,def ...[]string) []string{
 }
 
 
-func (myConf *myMap)GetInt(name string,def ...int) int{
+func (myMap *myMap)GetInt(name string,def ...int) int{
     var defVal int
     if(len(def)>0){
      defVal=def[0]
     }else{
      defVal=0
     }
-    val:=myConf.GetFloat(name,float64(defVal))
+    val:=myMap.GetFloat(name,float64(defVal))
     return int(val)
 }
 
-func (myConf *myMap)GetIntArray(name string,def ...[]int) []int{
+func (myMap *myMap)GetIntArray(name string,def ...[]int) []int{
    var defVal []int
    if(len(def)>0){
     defVal=def[0]
    }else{
      defVal=[]int{}
    }
-   float_arr:=myConf.GetFloatArray(name,intArr2Float(defVal))
+   float_arr:=myMap.GetFloatArray(name,intArr2Float(defVal))
    result:=make([]int,0,len(float_arr))
    for i,v:=range float_arr{
      result[i]=int(v)
@@ -115,14 +115,14 @@ func intArr2Float(intArr []int) []float64{
    return floatArr
 } 
 
-func (myConf *myMap)GetFloat(name string,def ...float64) float64{
+func (myMap *myMap)GetFloat(name string,def ...float64) float64{
    var defVal float64
    if(len(def)>0){
        defVal=def[0]
     }else{
        defVal=0
      }
-    ret,err:= strconv.ParseFloat(myConf.GetString(name,fmt.Sprint(defVal)),64)
+    ret,err:= strconv.ParseFloat(myMap.GetString(name,fmt.Sprint(defVal)),64)
     if(err!=nil && len(def)>0){
       return def[0]
      }
@@ -130,7 +130,7 @@ func (myConf *myMap)GetFloat(name string,def ...float64) float64{
 }
 
 
-func (myConf *myMap)GetFloatArray(name string,def ...[]float64) []float64{
+func (myMap *myMap)GetFloatArray(name string,def ...[]float64) []float64{
    var defVal []float64
    if(len(def)>0){
     defVal=def[0]
@@ -142,7 +142,7 @@ func (myConf *myMap)GetFloatArray(name string,def ...[]float64) []float64{
      strArr[index]=fmt.Sprint(v)
    }
    
-   str_arr:=myConf.GetStringArray(name,strArr)
+   str_arr:=myMap.GetStringArray(name,strArr)
    result:=make([]float64,0,len(str_arr))
    for i,v:=range str_arr{
       ret,_:= strconv.ParseFloat(v,64)
@@ -152,8 +152,8 @@ func (myConf *myMap)GetFloatArray(name string,def ...[]float64) []float64{
 }
 
 
-func (myConf *myMap)GetBool(name string) bool{
-  val:=myConf.GetString(name)
+func (myMap *myMap)GetBool(name string) bool{
+  val:=myMap.GetString(name)
   if(val==""){
      return false
   }
@@ -165,11 +165,11 @@ func (myConf *myMap)GetBool(name string) bool{
 }
 
 
-func (myConf *myMap)Get(name string)(val interface{}){
+func (myMap *myMap)Get(name string)(val interface{}){
    if(name!="" && name[0]!='/'){
-     name=strings.Join(myConf.paths,"/")+"/"+name
+     name=strings.Join(myMap.paths,"/")+"/"+name
    }
-   _,val=MapWalk(myConf.configs,name)
+   _,val=MapWalk(myMap.configs,name)
    return
 }
 
