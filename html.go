@@ -72,23 +72,6 @@ func Html_input_reset(value string,other_params ... interface{}) string{
 	return Html_input_tag("reset","",value,other_params ...)
 }
 
-func Html_select(name string,selected string,values map[string]string,other_params ...interface{}) string{
-   params:=make(map[string]string)
-   params["name"]=name
-   html:="<select"+paramsAsString(params_merge(params,other_params))+">\n"
-   for k,v:=range values{
-		option_fmt:="<option name='%s'%s>%s</option>\n"
-		select_str:=""
-		if(selected==k){
-			select_str=" selected='selected'"
-		}
-		option:=fmt.Sprintf(option_fmt,template.HTMLEscapeString(k),select_str,template.HTMLEscapeString(v))
-		html+=option
-   }
-   html+="</select>";
-	return html
-}
-
 func Html_link(url string,text string,more_params ...interface{}) string{
  params:=make(map[string]string)
  params["href"]=url
@@ -114,4 +97,51 @@ func Html_datalist(id string,values []string) string{
   }
   html+="</datalist>"
   return html
+}
+
+func Html_textArea(name string,value string,more_params ...interface{}) string{
+  params:=make(map[string]string)
+  params["name"]=name
+  params["value"]=value
+  html:="<textarea"+paramsAsString(params_merge(params,more_params))+">"+template.HTMLEscapeString(value)+"</textarea>"
+  return html
+}
+
+
+type Html_Options struct{
+    Items []*html_option
+}
+
+type html_option struct{
+    Name interface{}
+    Value interface{}
+    Checked bool
+    Params map[string]string
+}
+func (options *Html_Options)AddOption(name interface{},value interface{},checked bool){
+   option:=new(html_option)
+   option.Name=name
+   option.Value=value
+   option.Checked=checked
+   options.Items=append(options.Items,option)
+}
+
+
+func Html_select(name string,options *Html_Options,other_params ...interface{}) string{
+   params:=make(map[string]string)
+   params["name"]=name
+   html:="<select"+paramsAsString(params_merge(params,other_params))+">\n"
+   for _,option:=range options.Items{
+		option_fmt:="<option value='%s'%s>%s</option>\n"
+		select_str:=""
+		if(option.Checked){
+			select_str=" selected='selected'"
+		}
+		name:=fmt.Sprintf("%s",option.Name)
+		value:=fmt.Sprintf("%s",option.Value)
+		option_str:=fmt.Sprintf(option_fmt,template.HTMLEscapeString(name),select_str,template.HTMLEscapeString(value))
+		html+=option_str
+   }
+   html+="</select>";
+	return html
 }

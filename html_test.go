@@ -3,13 +3,16 @@ import (
 	"fmt"
 //	"github.com/bmizerany/assert"
 	"testing"
+//	"reflect"
 )
 func TestHtml_input_text(t *testing.T){
    test:=Html_input_text("a","b","style='color:red'","class='c'")
    fmt.Println(test)
-   sele:=Html_select("a","v",map[string]string{"a":"aasss","v":"sss","s":"tttt\"ss>s"})
+   html_option:=new(Html_Options)
+   html_option.AddOption("a","b",false)
+   sele:=Html_select("a",html_option,"id='a'")
    fmt.Println(sele)
-   
+//    fmt.Println("type:",c.Kind())
    link:=Html_link("http://www.baidu.com","baidu-百度")
    fmt.Println(link)
    
