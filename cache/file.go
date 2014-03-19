@@ -12,15 +12,20 @@ import (
    "time"
    "path"
    "path/filepath"
+   "github.com/hidu/goutils"
+
 )
 
 type FileCache struct{
    data_dir string
-	Cache
+   gc_interval int64
+    Cache
 }
 
 func NewFileCache(data_dir string) *FileCache{
-	return &FileCache{data_dir:data_dir}
+    cache:= &FileCache{data_dir:data_dir,gc_interval:3600}
+    cache.startGcTimer()
+    return cache
 }
 func (cache *FileCache)Set(key string,data []byte,life int64) (suc bool){
 //    log.Println("cache set ",key,data)
@@ -44,8 +49,8 @@ func (cache *FileCache)Set(key string,data []byte,life int64) (suc bool){
 
 func (cache *FileCache)Get(key string)(has bool,data []byte){
 //    log.Println("cache get ",key)
-	 cache_path:=cache.genCachePath(key)
-	 return cache.getByPath(cache_path)
+     cache_path:=cache.genCachePath(key)
+     return cache.getByPath(cache_path)
 }
 
 func (cache *FileCache)Delete(key string) bool{
@@ -70,13 +75,13 @@ func (cache *FileCache)DeleteAll() bool{
 func (cache *FileCache)genCachePath(key string) string{
    h:=md5.New()
    h.Write([]byte(key))
- 	md5_str:= hex.EncodeToString(h.Sum(nil))
- 	file_path:=cache.data_dir+"/"+string(md5_str[:3])+"/"+md5_str
- 	return file_path
+     md5_str:= hex.EncodeToString(h.Sum(nil))
+     file_path:=cache.data_dir+"/"+string(md5_str[:3])+"/"+md5_str
+     return file_path
 }
 
 func (cache *FileCache)getByPath(file_path string)(has bool,data []byte){
-	f,err:=os.Open(file_path)
+    f,err:=os.Open(file_path)
     defer f.Close()
     if err!=nil{
       return
@@ -114,4 +119,12 @@ func (cache *FileCache)GC(){
       }
       return nil
   })
+}
+
+func (cache *FileCache)SetGcInterval(sec int64){
+  cache.gc_interval=sec
+}
+
+func (cache *FileCache)startGcTimer(){
+    goutils.SetInterval(cache.GC,cache.gc_interval)
 }

@@ -1,11 +1,11 @@
 package cache
-
 type Cache interface{
    Set(key string,val []byte,life int64)(suc bool)
    Get(key string)(has bool,data []byte)
    Delete(key string)(suc bool)
    DeleteAll()(suc bool)
    GC()
+   SetGcInterval(sec int64)
 }
 
 type Data struct{
