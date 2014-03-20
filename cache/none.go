@@ -24,6 +24,5 @@ func (cache *NoneCache)DeleteAll()(suc bool){
 func (cache *NoneCache)GC(){
 
 }
-func (cache *NoneCache)SetGcInterval(sec int64){
-
+func (cache *NoneCache)StartGcTimer(sec int64){
 }

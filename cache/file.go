@@ -13,23 +13,26 @@ import (
    "path"
    "path/filepath"
    "github.com/hidu/goutils"
+   "sync"
 
 )
 
 type FileCache struct{
    data_dir string
    gc_interval int64
-    Cache
+   Cache
+   mu     sync.Mutex 
 }
 
 func NewFileCache(data_dir string) *FileCache{
     cache:= &FileCache{data_dir:data_dir,gc_interval:3600}
-    cache.startGcTimer()
     return cache
 }
 func (cache *FileCache)Set(key string,data []byte,life int64) (suc bool){
 //    log.Println("cache set ",key,data)
+	defer cache.mu.Unlock()
    cache_path:=cache.genCachePath(key)
+   cache.mu.Lock()
    f,err:=os.OpenFile(cache_path,os.O_CREATE|os.O_RDWR,0644)
    defer f.Close()
    if err!=nil{
@@ -54,7 +57,9 @@ func (cache *FileCache)Get(key string)(has bool,data []byte){
 }
 
 func (cache *FileCache)Delete(key string) bool{
+   defer cache.mu.Unlock()
    cache_path:=cache.genCachePath(key)
+   cache.mu.Lock()
    _,err:=os.Stat(cache_path)
    if err!=nil{
      log.Println("delete cache err:",err)
@@ -81,6 +86,8 @@ func (cache *FileCache)genCachePath(key string) string{
 }
 
 func (cache *FileCache)getByPath(file_path string)(has bool,data []byte){
+    defer cache.mu.Unlock()
+    cache.mu.Lock()
     f,err:=os.Open(file_path)
     defer f.Close()
     if err!=nil{
@@ -121,10 +128,7 @@ func (cache *FileCache)GC(){
   })
 }
 
-func (cache *FileCache)SetGcInterval(sec int64){
-  cache.gc_interval=sec
-}
 
-func (cache *FileCache)startGcTimer(){
-    goutils.SetInterval(cache.GC,cache.gc_interval)
+func (cache *FileCache)StartGcTimer(sec int64){
+    goutils.SetInterval(cache.GC,sec)
 }

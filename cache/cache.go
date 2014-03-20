@@ -5,7 +5,7 @@ type Cache interface{
    Delete(key string)(suc bool)
    DeleteAll()(suc bool)
    GC()
-   SetGcInterval(sec int64)
+   StartGcTimer(sec int64)
 }
 
 type Data struct{
