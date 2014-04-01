@@ -1,13 +1,15 @@
 package goutils
 
 import (
-//    "fmt"
-    "github.com/bmizerany/assert"
+    "fmt"
     "testing"
 )
 
 func TestIsInArray(t *testing.T) {
   arr:=[]string{"a","b","c"}
-  has:=IsInArray("a",arr,[]string)
-  assert.Equal(t,true,has)
+  a(arr)
+}
+
+func a(b interface{}){
+  fmt.Println(b)
 }
