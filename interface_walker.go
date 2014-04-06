@@ -16,7 +16,7 @@ type Object struct {
     paths []string
 }
 func NewInterfaceWalker(obj interface{}) *Object {
-    return &Object{data:obj, paths: []string{}}
+    return &Object{data:obj, paths: []string{"/"}}
 }
 
 
@@ -28,16 +28,19 @@ func (obj *Object) GetObject(path interface{}) (val *Object,has bool) {
     return
 }
 
-func (obj *Object) Gointo(path interface{}) {
-    path_str:=strings.Join(obj.paths,"/")+"/"+fmt.Sprint(path)
-    path_str_clean:=os_path.Clean(path_str)
-    obj.paths=strings.Split(path_str_clean,"/")
+func (obj *Object) GoInto(path interface{}) {
+    path_orign:=fmt.Sprint(path)
+    path_str:=path_orign
+    if len(path_orign)==0 || path_orign[0]!='/'{
+      path_str=strings.Join(obj.paths,"/")+"/"+path_orign
+    }
+    obj.paths=strings.Split(os_path.Clean(path_str),"/")
 }
 
 
 func (obj *Object) GetInterface(path interface{}) (val interface{},has bool) {
-    path_str:=os_path.Clean(fmt.Sprint(path))
-    if path_str != "." && path_str[0] != '/' {
+    path_str:=fmt.Sprint(path)
+    if len(path_str)>0 && path_str[0] != '/' {
         path_str = strings.Join(obj.paths, "/") + "/" + path_str
     }
     val,has= InterfaceWalk(obj.data, path_str)
@@ -184,7 +187,8 @@ func (obj *Object) GetBool(path interface{}) bool {
 *quick get the val from a interface
 */
 func InterfaceWalk(obj interface{}, path interface{}) (val interface{},has bool) {
-    path_str:= strings.TrimSpace(os_path.Clean(fmt.Sprint(path)))
+    path_orign:=fmt.Sprint(path)
+    path_str:= strings.TrimSpace(os_path.Clean(path_orign))
 //    fmt.Println("path:",path_str)
     if path_str == "/" || path_str == "." {
         return  obj,true
@@ -192,7 +196,7 @@ func InterfaceWalk(obj interface{}, path interface{}) (val interface{},has bool)
     val_tmp:= obj
     paths := strings.Split(strings.Trim(path_str, "/"), "/")
     n:=0
-    for _, sub_name := range paths {
+    for i, sub_name := range paths {
         _type:=reflect.TypeOf(val_tmp).String()
          _value:=reflect.ValueOf(val_tmp)
         if(len(_type)>3 && _type[:3]=="map"){
@@ -224,7 +228,7 @@ func InterfaceWalk(obj interface{}, path interface{}) (val interface{},has bool)
             }
           val_tmp=_value.Index(index).Interface()
         }else{
-           log.Printf("not support now:%s",_type)
+           log.Printf("date type error,not map or slice,[%s]=(%v,type=%T),find=%s",strings.Join(paths[:i],"/"),val_tmp,val_tmp,sub_name)
             break
           }
        n++
