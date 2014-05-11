@@ -3,10 +3,13 @@ package goutils
 import (
     "io/ioutil"
     "os"
+     "crypto/md5"
+     "io"
+     "fmt"
 )
 
 const (
-    FILE_APPEND = 1
+    FILE_APPEND = os.O_APPEND
 )
 
 func File_get_contents(file_path string) (data []byte, err error) {
@@ -22,7 +25,7 @@ func File_get_contents(file_path string) (data []byte, err error) {
     return bf, nil
 }
 
-func File_put_contents(file_path string, data []byte, def ...int) {
+func File_put_contents(file_path string, data []byte, def ...int) error{
     flags := os.O_RDWR | os.O_CREATE
     is_append := false
     if len(def) > 0 && def[0] == FILE_APPEND {
@@ -32,7 +35,7 @@ func File_put_contents(file_path string, data []byte, def ...int) {
     f, err := os.OpenFile(file_path, flags, 0644)
     defer f.Close()
     if err != nil {
-        panic(err)
+       return err
     }
     write_at := int64(0)
     if is_append {
@@ -40,16 +43,23 @@ func File_put_contents(file_path string, data []byte, def ...int) {
         write_at = stat.Size()
     }
     f.WriteAt(data, write_at)
+    return nil
 }
 
 func File_exists(file_path string) bool {
     _, err := os.Stat(file_path)
     if err == nil {
         return true
-    }
+     }
     return os.IsExist(err)
 }
 
-func Md5_file(file_path string) string {
-    return ""
+func File_Md5(file_path string) (string,error) {
+	file, err := os.Open(file_path)
+	if(err==nil){
+	 	h := md5.New()
+	   io.Copy(h,file)
+	   return fmt.Sprintf("%x",h.Sum(nil)),nil	
+	 }
+    return "",err
 }

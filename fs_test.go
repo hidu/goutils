@@ -3,7 +3,7 @@ package goutils
 import (
     "os"
     "testing"
-    //    "fmt"
+        "fmt"
 )
 
 func TestFile_get_contents(t *testing.T) {
@@ -11,6 +11,8 @@ func TestFile_get_contents(t *testing.T) {
     if len(res) == 0 {
         t.FailNow()
     }
+    md5_str,err:=File_Md5("./fs.go")
+    fmt.Println("fs.go md5:",md5_str,err)
 }
 func TestFile_put_contents(t *testing.T) {
     test_data := "hello"
