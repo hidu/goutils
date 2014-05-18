@@ -4,6 +4,10 @@ import (
  "io/ioutil"
  "strings"
  "log"
+ "mime"
+ "time"
+ "path/filepath"
+ "net/http"
 )
 type Resource struct{}
 
@@ -30,4 +34,27 @@ func (re *Resource)Get(path string)(resources.Resource,error){
       return nil,err
      }
      return res,nil
+}
+
+func (re *Resource)HandleStatic(w http.ResponseWriter,r *http.Request,path string){
+    res,err:=re.Get(path)
+    if(err!=nil){
+        http.NotFound(w,r)
+        return;
+     }
+    finfo,_:=res.Stat()
+    modtime:=finfo.ModTime()
+    if t, err := time.Parse(http.TimeFormat, r.Header.Get("If-Modified-Since")); err == nil && modtime.Before(t.Add(1*time.Second)) {
+           h := w.Header()
+           delete(h, "Content-Type")
+           delete(h, "Content-Length")
+           w.WriteHeader(http.StatusNotModified)
+           return
+           }
+   mimeType:= mime.TypeByExtension(filepath.Ext(path))
+   if(mimeType!=""){
+       w.Header().Set("Content-Type",mimeType)
+     }
+    w.Header().Set("Last-Modified",modtime.UTC().Format(http.TimeFormat))
+    w.Write(re.Load(path))
 }
