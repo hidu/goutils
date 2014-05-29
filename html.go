@@ -2,6 +2,7 @@ package goutils
 import (
   "html/template"
   "fmt"
+  "regexp"
 )
 
 func Html_input_tag(tagType string,name string,value string,other_params ... interface{}) (html string) {
@@ -148,4 +149,10 @@ func Html_select(name string,options *Html_Options,other_params ...interface{}) 
    }
    html+="</select>";
     return html
+}
+
+var html_tag_reg *regexp.Regexp =regexp.MustCompile(`>\s+<`)
+
+func Html_reduceSpace(html string) string{
+  return html_tag_reg.ReplaceAllString(html,"><")
 }

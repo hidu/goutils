@@ -37,12 +37,13 @@ func File_put_contents(file_path string, data []byte, def ...int) error{
     if err != nil {
        return err
     }
-    write_at := int64(0)
     if is_append {
         stat, _ := f.Stat()
-        write_at = stat.Size()
+        f.WriteAt(data, stat.Size())
+    }else{
+       f.Truncate(0)
+   	   f.Write(data)
     }
-    f.WriteAt(data, write_at)
     return nil
 }
 
