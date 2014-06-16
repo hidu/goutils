@@ -3,6 +3,7 @@ package goutils
 import (
     "fmt"
     "regexp"
+     "strings"
 )
 
 /**
@@ -41,4 +42,24 @@ func StringToMap(str string) (data map[string]string) {
 
 func isChar(ru rune) bool {
     return (ru >= 0 && ru <= 9) || (ru >= 'a' && ru <= 'z') || (ru >= 'A' && ru <= 'Z') || ru == '_' || ru == '-'
+}
+
+func LoadText2Slice(text string) (result [][]string){
+  lines:=strings.Split(text,"\n")
+  r:=regexp.MustCompile(`\s+`)
+  for _,v:=range lines{
+     index:=strings.IndexByte(v,'#')
+     if(index==0){
+       continue
+     }
+     if(index>0){
+        v=v[:index]
+     }
+     v=strings.TrimSpace(v)
+     if (v==""){
+        continue
+     }
+     result=append(result,r.Split(v,-1))
+  }
+ return 
 }
