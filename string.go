@@ -4,6 +4,7 @@ import (
     "fmt"
     "regexp"
      "strings"
+     "crypto/md5"
 )
 
 /**
@@ -62,4 +63,10 @@ func LoadText2Slice(text string) (result [][]string){
      result=append(result,r.Split(v,-1))
   }
  return 
+}
+ 
+func StrMd5(mystr string)string{
+  h := md5.New()
+  h.Write([]byte(mystr))
+  return fmt.Sprintf("%x",h.Sum(nil))
 }
