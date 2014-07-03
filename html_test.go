@@ -1,4 +1,4 @@
-package goutils
+package utils
 import (
     "fmt"
 //    "github.com/bmizerany/assert"

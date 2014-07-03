@@ -1,4 +1,4 @@
-package goutils
+package utils
 import (
   "html/template"
   "fmt"

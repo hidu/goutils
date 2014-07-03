@@ -1,4 +1,4 @@
-package goutils
+package utils
 import (
  "gopkg.in/cookieo9/resources-go.v2"
  "io/ioutil"
@@ -12,6 +12,7 @@ import (
 type Resource struct{}
 
 var DefaultResource *Resource=&Resource{}
+
 
 func (re *Resource)Load(path string) []byte{
      res,err:=re.Get(path)
@@ -58,3 +59,33 @@ func (re *Resource)HandleStatic(w http.ResponseWriter,r *http.Request,path strin
     w.Header().Set("Last-Modified",modtime.UTC().Format(http.TimeFormat))
     w.Write(re.Load(path))
 }
+
+func ResetDefaultBundle(execDir bool){
+   resources.DefaultBundle=make(resources.BundleSequence,1,10)
+   var exe_dir, exe resources.Bundle
+   if exe_path, err := resources.ExecutablePath(); err == nil {
+		exe_dir = resources.OpenFS(filepath.Dir(exe_path))
+		if exe, err = resources.OpenZip(exe_path); err == nil {
+			resources.DefaultBundle = append(resources.DefaultBundle, exe)
+		}
+		if(execDir){
+			resources.DefaultBundle = append(resources.DefaultBundle, exe_dir)
+		}
+	}
+}
+
+//func init() {
+//	var cwd, cur_pkg, exe_dir, exe Bundle
+//	cwd = OpenFS(".")
+//	cur_pkg = OpenAutoBundle(OpenCurrentPackage)
+//
+//	if exe_path, err := ExecutablePath(); err == nil {
+//		exe_dir = OpenFS(filepath.Dir(exe_path))
+//		if exe, err = OpenZip(exe_path); err == nil {
+//			DefaultBundle = append(DefaultBundle, exe)
+//		}
+//	}
+//
+//	DefaultBundle = append(DefaultBundle, cwd, exe_dir, cur_pkg, exe)
+//}
+

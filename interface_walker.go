@@ -1,4 +1,4 @@
-package goutils
+package utils
 /**
 *toolkit for the interface{}
 */
