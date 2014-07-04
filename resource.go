@@ -49,6 +49,7 @@ func (re *Resource)HandleStatic(w http.ResponseWriter,r *http.Request,path strin
            h := w.Header()
            delete(h, "Content-Type")
            delete(h, "Content-Length")
+            w.Header().Set("Last-Modified",modtime.UTC().Format(http.TimeFormat))
            w.WriteHeader(http.StatusNotModified)
            return
            }
@@ -60,17 +61,29 @@ func (re *Resource)HandleStatic(w http.ResponseWriter,r *http.Request,path strin
     w.Write(re.Load(path))
 }
 
-func ResetDefaultBundle(execDir bool){
+func ResetDefaultBundle(){
    resources.DefaultBundle=make(resources.BundleSequence,1,10)
-   var exe_dir, exe resources.Bundle
+   
+   var cwd ,exe_dir, exe ,cur_pkg resources.Bundle
+    hasZip:=false
    if exe_path, err := resources.ExecutablePath(); err == nil {
-		exe_dir = resources.OpenFS(filepath.Dir(exe_path))
 		if exe, err = resources.OpenZip(exe_path); err == nil {
+            log.Println("bundle resource zip",exe_path)
+            hasZip=true
 			resources.DefaultBundle = append(resources.DefaultBundle, exe)
 		}
-		if(execDir){
+		if(err!=nil){
+		   log.Println("bundle resource  zip failed")
+		}
+		if(!hasZip){
+			exe_dir = resources.OpenFS(filepath.Dir(exe_path))
 			resources.DefaultBundle = append(resources.DefaultBundle, exe_dir)
 		}
+	}
+	if(!hasZip){
+	   cwd = resources.OpenFS(".")
+	   cur_pkg = resources.OpenAutoBundle(resources.OpenCurrentPackage)
+	   resources.DefaultBundle = append(resources.DefaultBundle, cwd,cur_pkg)
 	}
 }
 
