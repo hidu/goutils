@@ -130,5 +130,5 @@ func (cache *FileCache)GC(){
 
 
 func (cache *FileCache)StartGcTimer(sec int64){
-    goutils.SetInterval(cache.GC,sec)
+    utils.SetInterval(cache.GC,sec)
 }
