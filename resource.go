@@ -68,7 +68,7 @@ func ResetDefaultBundle(){
     hasZip:=false
    if exe_path, err := resources.ExecutablePath(); err == nil {
 		if exe, err = resources.OpenZip(exe_path); err == nil {
-            log.Println("bundle resource zip",exe_path)
+//            log.Println("bundle resource zip",exe_path)
             hasZip=true
 			resources.DefaultBundle = append(resources.DefaultBundle, exe)
 		}
