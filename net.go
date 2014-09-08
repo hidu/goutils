@@ -3,6 +3,7 @@ package utils
 import (
 	"net"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -30,9 +31,17 @@ func Net_isLocalIp(host string) bool {
 }
 
 func Net_getHostPortFromReq(req *http.Request) (host string, port int, err error) {
-	host, port, err = parseHostPort(req.Host)
+	return Net_getHostPortFromUrl(req.URL.String())
+}
+
+func Net_getHostPortFromUrl(urlStr string) (host string, port int, err error) {
+	urlObj, err := url.Parse(urlStr)
+	if err != nil {
+		return "", 0, err
+	}
+	host, port, err = parseHostPort(urlObj.Host)
 	if err == nil && port == 0 {
-		switch req.URL.Scheme {
+		switch urlObj.Scheme {
 		case "http":
 		case "ws":
 			port = 80
