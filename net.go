@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	//	"fmt"
 )
 
 func Net_isLocalIp(host string) bool {
@@ -31,7 +32,13 @@ func Net_isLocalIp(host string) bool {
 }
 
 func Net_getHostPortFromReq(req *http.Request) (host string, port int, err error) {
-	return Net_getHostPortFromUrl(req.URL.String())
+	urlStr := ""
+	if req.URL.Scheme != "" {
+		urlStr = req.URL.Scheme + "://" + req.Host
+	} else {
+		urlStr = "http://" + req.Host
+	}
+	return Net_getHostPortFromUrl(urlStr)
 }
 
 func Net_getHostPortFromUrl(urlStr string) (host string, port int, err error) {
