@@ -1,4 +1,4 @@
-package http
+package utils
 
 import (
 	"bufio"
@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 )
-const RAW_HEADER_NAME="x-raw-header-name"
-var DEBUG_PRINT_HEADER bool=false
+const HTTP_RAW_HEADER_NAME="x-raw-header-name"
+var HTTP_DEBUG_PRINT_HEADER bool=false
 func NewHttpServer(laddr string, handler http.Handler) error {
 	ln, err := net.Listen("tcp", laddr)
 	if err != nil {
@@ -141,12 +141,12 @@ func newRawHeader(reader *bufio.Reader) (*rawHttpHeader, error) {
 			names = append(names, strings.TrimSpace(tmp[0]))
 		}
 	}
-	if(DEBUG_PRINT_HEADER){
+	if(HTTP_DEBUG_PRINT_HEADER){
 		fmt.Println("rawHeader:\n",string(rawHeader.rawHeader),"\n\n")
 	}
 	headerNewBf := bytes.NewBuffer(rawHeader.rawHeader)
 	headerNewBf.WriteString("\r\n")
-	headerNewBf.WriteString(fmt.Sprintf("%s :%s\r\n",RAW_HEADER_NAME,strings.Join(names, "|")))
+	headerNewBf.WriteString(fmt.Sprintf("%s :%s\r\n",HTTP_RAW_HEADER_NAME,strings.Join(names, "|")))
 	headerNewBf.WriteString("\r\n")
 	if(len(datas)==2){
 		headerNewBf.WriteString(datas[1])
