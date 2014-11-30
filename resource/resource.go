@@ -1,4 +1,4 @@
-package utils
+package resource
 
 import (
 	"gopkg.in/cookieo9/resources-go.v2"
