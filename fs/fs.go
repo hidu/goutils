@@ -1,4 +1,4 @@
-package utils
+package fs
 
 import (
 	"crypto/md5"
@@ -6,13 +6,14 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 const (
 	FILE_APPEND = os.O_APPEND
 )
 
-func File_get_contents(file_path string) (data []byte, err error) {
+func FileGetContents(file_path string) (data []byte, err error) {
 	f, err := os.Open(file_path)
 	defer f.Close()
 	if err != nil {
@@ -25,7 +26,7 @@ func File_get_contents(file_path string) (data []byte, err error) {
 	return bf, nil
 }
 
-func File_put_contents(file_path string, data []byte, def ...int) error {
+func FilePutContents(file_path string, data []byte, def ...int) error {
 	flags := os.O_RDWR | os.O_CREATE
 	is_append := false
 	if len(def) > 0 && def[0] == FILE_APPEND {
@@ -47,7 +48,7 @@ func File_put_contents(file_path string, data []byte, def ...int) error {
 	return nil
 }
 
-func File_exists(file_path string) bool {
+func FileExists(file_path string) bool {
 	_, err := os.Stat(file_path)
 	if err == nil {
 		return true
@@ -63,4 +64,13 @@ func File_Md5(file_path string) (string, error) {
 		return fmt.Sprintf("%x", h.Sum(nil)), nil
 	}
 	return "", err
+}
+
+// DirCheck create dir if not exists
+func DirCheck(filePath string) error {
+	dir := filepath.Dir(filePath)
+	if !FileExists(dir) {
+		return  os.MkdirAll(dir, 0777)
+	}
+	return nil
 }
