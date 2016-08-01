@@ -1,7 +1,8 @@
-package utils
+package html_util
 
 import (
 	"fmt"
+	"github.com/hidu/goutils/str_util"
 	"html/template"
 	"regexp"
 )
@@ -36,7 +37,7 @@ func params_merge(params map[string]string, more_params []interface{}) map[strin
 				params[k] = v
 			}
 		case string:
-			_params := StringToMap(fmt.Sprint(param))
+			_params := str_util.StringToMap(fmt.Sprint(param))
 			for k, v := range _params {
 				params[k] = v
 			}

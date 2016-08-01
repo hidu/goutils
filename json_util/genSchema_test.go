@@ -1,15 +1,15 @@
-package jsonutils
+package json_util
 
 import (
-	"testing"
 	"encoding/json"
-//	"fmt"
+	"testing"
+	//	"fmt"
 	"github.com/bmizerany/assert"
 	"github.com/xeipuuv/gojsonschema"
 )
 
-func TestGenJsonSchema(t *testing.T){
-	str:=`
+func TestGenJsonSchema(t *testing.T) {
+	str := `
 		{
 		"k1":"a",
 		"k2":1,
@@ -26,20 +26,20 @@ func TestGenJsonSchema(t *testing.T){
 		}
 	`
 	var obj interface{}
-	err:=json.Unmarshal([]byte(str),&obj)
+	err := json.Unmarshal([]byte(str), &obj)
 	assert.Equal(t, err, nil)
-	
-	schema,err:=GenJsonSchema(obj)
+
+	schema, err := GenJsonSchema(obj)
 	assert.Equal(t, err, nil)
-	
-	_,err=json.MarshalIndent(schema,"","  ")
+
+	_, err = json.MarshalIndent(schema, "", "  ")
 	assert.Equal(t, err, nil)
-//	fmt.Println(string(bs))
-	
-	goSchema,err:=gojsonschema.NewSchema(gojsonschema.NewGoLoader(schema))
+	//	fmt.Println(string(bs))
+
+	goSchema, err := gojsonschema.NewSchema(gojsonschema.NewGoLoader(schema))
 	assert.Equal(t, err, nil)
-	documentLoader:=gojsonschema.NewStringLoader(str)
-	ret,err:=goSchema.Validate(documentLoader)
+	documentLoader := gojsonschema.NewStringLoader(str)
+	ret, err := goSchema.Validate(documentLoader)
 	assert.Equal(t, err, nil)
 	assert.Equal(t, ret.Valid(), true)
 }

@@ -6,7 +6,7 @@ import (
 	//   "fmt"
 	"bytes"
 	"encoding/gob"
-	"github.com/hidu/goutils"
+	"github.com/hidu/goutils/time_util"
 	"io/ioutil"
 	"log"
 	"os"
@@ -127,5 +127,5 @@ func (cache *FileCache) GC() {
 }
 
 func (cache *FileCache) StartGcTimer(sec int64) {
-	utils.SetInterval(cache.GC, sec)
+	time_util.SetInterval(cache.GC, sec)
 }

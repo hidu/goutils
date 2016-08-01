@@ -1,28 +1,27 @@
-package jsonutils
+package json_util
 
 import (
-	"testing"
 	"encoding/json"
 	"fmt"
 	"github.com/bmizerany/assert"
+	"testing"
 )
 
-
 type DataStrcut struct {
-        A   int64    `json:"a"`
-        B   []string `json:"b"`
-        Fff []string `json:"fff"`
-        G   struct {
-                A1 int64 `json:"a1"`
-                A2 int64 `json:"a2"`
-        } `json:"g"`
-        Gg []struct {
-                D int64 `json:"d"`
-        } `json:"gg"`
+	A   int64    `json:"a"`
+	B   []string `json:"b"`
+	Fff []string `json:"fff"`
+	G   struct {
+		A1 int64 `json:"a1"`
+		A2 int64 `json:"a2"`
+	} `json:"g"`
+	Gg []struct {
+		D int64 `json:"d"`
+	} `json:"gg"`
 }
 
-func TestFixDataWithSchema(t *testing.T){
-	dataStr:=`{
+func TestFixDataWithSchema(t *testing.T) {
+	dataStr := `{
     "a": 145,
     "b": [
         "d",
@@ -35,7 +34,7 @@ func TestFixDataWithSchema(t *testing.T){
     	"a2":456
     }
 }`
-	schemaStr:=`
+	schemaStr := `
 	{
     "properties": {
         "a": {
@@ -69,34 +68,34 @@ func TestFixDataWithSchema(t *testing.T){
 }
 	`
 	var data interface{}
-	err:=json.Unmarshal([]byte(dataStr),&data)
+	err := json.Unmarshal([]byte(dataStr), &data)
 	assert.Equal(t, err, nil)
-//	fmt.Println("data:",data)
-	
-	var schema interface{}
-	err=json.Unmarshal([]byte(schemaStr),&schema)
-	assert.Equal(t, err, nil)
-//	fmt.Println("schema:",schema)
-	
-	dataNew,err:=FixDataWithSchema(data,schema)
-	assert.Equal(t, err, nil)
-	
-	dbs,err:=json.Marshal(dataNew)
-	assert.Equal(t, err, nil)
-	
-	fmt.Println(string(dbs))
-	
-	var myDs DataStrcut
-	err=json.Unmarshal(dbs,&myDs)
-	assert.Equal(t, err, nil)
-	
-	assert.Equal(t,145,int(myDs.A))
-	
-	assert.Equal(t,1,len(myDs.Gg))
-	
-	assert.Equal(t,789,int(myDs.Gg[0].D))
+	//	fmt.Println("data:",data)
 
-	assert.Equal(t,123,int(myDs.G.A1))
-	assert.Equal(t,456,int(myDs.G.A2))
-	
+	var schema interface{}
+	err = json.Unmarshal([]byte(schemaStr), &schema)
+	assert.Equal(t, err, nil)
+	//	fmt.Println("schema:",schema)
+
+	dataNew, err := FixDataWithSchema(data, schema)
+	assert.Equal(t, err, nil)
+
+	dbs, err := json.Marshal(dataNew)
+	assert.Equal(t, err, nil)
+
+	fmt.Println(string(dbs))
+
+	var myDs DataStrcut
+	err = json.Unmarshal(dbs, &myDs)
+	assert.Equal(t, err, nil)
+
+	assert.Equal(t, 145, int(myDs.A))
+
+	assert.Equal(t, 1, len(myDs.Gg))
+
+	assert.Equal(t, 789, int(myDs.Gg[0].D))
+
+	assert.Equal(t, 123, int(myDs.G.A1))
+	assert.Equal(t, 456, int(myDs.G.A2))
+
 }

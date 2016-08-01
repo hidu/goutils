@@ -56,7 +56,7 @@ func FileExists(file_path string) bool {
 	return os.IsExist(err)
 }
 
-func File_Md5(file_path string) (string, error) {
+func FileMd5(file_path string) (string, error) {
 	file, err := os.Open(file_path)
 	if err == nil {
 		h := md5.New()
@@ -70,7 +70,7 @@ func File_Md5(file_path string) (string, error) {
 func DirCheck(filePath string) error {
 	dir := filepath.Dir(filePath)
 	if !FileExists(dir) {
-		return  os.MkdirAll(dir, 0777)
+		return os.MkdirAll(dir, 0777)
 	}
 	return nil
 }

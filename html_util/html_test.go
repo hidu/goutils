@@ -1,4 +1,4 @@
-package utils
+package html_util
 
 import (
 	"fmt"

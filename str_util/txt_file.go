@@ -1,4 +1,4 @@
-package utils
+package str_util
 
 import (
 	"fmt"
