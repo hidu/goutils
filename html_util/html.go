@@ -2,9 +2,10 @@ package html_util
 
 import (
 	"fmt"
-	"github.com/hidu/goutils/str_util"
 	"html/template"
 	"regexp"
+
+	"github.com/hidu/goutils/str_util"
 )
 
 func Html_input_tag(tagType string, name string, value string, other_params ...interface{}) (html string) {

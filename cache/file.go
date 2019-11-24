@@ -3,10 +3,10 @@ package cache
 import (
 	"crypto/md5"
 	"encoding/hex"
+
 	//   "fmt"
 	"bytes"
 	"encoding/gob"
-	"github.com/hidu/goutils/time_util"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/hidu/goutils/time_util"
 )
 
 type FileCache struct {

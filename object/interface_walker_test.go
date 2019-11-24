@@ -3,8 +3,9 @@ package object
 import (
 	//      "fmt"
 	"encoding/json"
-	"github.com/bmizerany/assert"
 	"testing"
+
+	"github.com/bmizerany/assert"
 )
 
 func TestGetVal(t *testing.T) {

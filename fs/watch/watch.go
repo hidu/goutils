@@ -6,10 +6,11 @@ package watch
 import (
 	"errors"
 	"fmt"
-	"github.com/howeyc/fsnotify"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/howeyc/fsnotify"
 )
 
 func debugMessage(format string, a ...interface{}) {

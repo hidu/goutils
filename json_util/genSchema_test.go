@@ -3,6 +3,7 @@ package json_util
 import (
 	"encoding/json"
 	"testing"
+
 	//	"fmt"
 	"github.com/bmizerany/assert"
 	"github.com/xeipuuv/gojsonschema"

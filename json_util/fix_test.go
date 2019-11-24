@@ -3,8 +3,9 @@ package json_util
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bmizerany/assert"
 	"testing"
+
+	"github.com/bmizerany/assert"
 )
 
 type DataStrcut struct {

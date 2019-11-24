@@ -5,8 +5,9 @@ package json_util
 
 import (
 	"fmt"
-	"github.com/xeipuuv/gojsonschema"
 	"reflect"
+
+	"github.com/xeipuuv/gojsonschema"
 )
 
 func FixDataWithSchema(data interface{}, schema interface{}) (dataFix interface{}, err error) {
