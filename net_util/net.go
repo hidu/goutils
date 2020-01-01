@@ -6,7 +6,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	//	"fmt"
 )
 
 func Net_isLocalIp(host string) bool {

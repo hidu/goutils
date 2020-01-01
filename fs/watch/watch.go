@@ -1,7 +1,7 @@
 package watch
 
-/**
-*@see https://github.com/gophertown/looper/blob/master/watch.go
+/*
+ * @see https://github.com/gophertown/looper/blob/master/watch.go
  */
 import (
 	"errors"
@@ -22,7 +22,7 @@ func debugError(msg error) {
 	fmt.Println(msg.Error())
 }
 
-//type FileNotifyEvent fsnotify.FileEvent
+// type FileNotifyEvent fsnotify.FileEvent
 
 type RecursiveWatcher struct {
 	Watcher     *fsnotify.Watcher
@@ -73,7 +73,7 @@ func (rw *RecursiveWatcher) AddFolder(path string) {
 
 func (rw *RecursiveWatcher) Run(debug bool) {
 	rw.AddFolder(rw.path)
-	//        go func() {
+	// go func() {
 	for {
 		select {
 		case event := <-rw.Watcher.Event:
@@ -105,7 +105,7 @@ func (rw *RecursiveWatcher) Run(debug bool) {
 			log.Println("error", err)
 		}
 	}
-	//        }()
+	// }()
 }
 
 // returns a slice of subfolders (recursive), including the folder passed in

@@ -71,12 +71,12 @@ func TestFixDataWithSchema(t *testing.T) {
 	var data interface{}
 	err := json.Unmarshal([]byte(dataStr), &data)
 	assert.Equal(t, err, nil)
-	//	fmt.Println("data:",data)
+	// fmt.Println("data:",data)
 
 	var schema interface{}
 	err = json.Unmarshal([]byte(schemaStr), &schema)
 	assert.Equal(t, err, nil)
-	//	fmt.Println("schema:",schema)
+	// fmt.Println("schema:",schema)
 
 	dataNew, err := FixDataWithSchema(data, schema)
 	assert.Equal(t, err, nil)

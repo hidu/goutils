@@ -1,12 +1,11 @@
 package cache
 
 import (
-	"crypto/md5"
-	"encoding/hex"
-
-	//   "fmt"
 	"bytes"
+	"crypto/md5"
 	"encoding/gob"
+	"encoding/hex"
+	// "fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -30,7 +29,7 @@ func NewFileCache(data_dir string) *FileCache {
 	return cache
 }
 func (cache *FileCache) Set(key string, data []byte, life int64) (suc bool) {
-	//    log.Println("cache set ",key,data)
+	// log.Println("cache set ",key,data)
 	defer cache.mu.Unlock()
 	cache_path := cache.genCachePath(key)
 	cache.mu.Lock()
@@ -52,7 +51,7 @@ func (cache *FileCache) Set(key string, data []byte, life int64) (suc bool) {
 }
 
 func (cache *FileCache) Get(key string) (has bool, data []byte) {
-	//    log.Println("cache get ",key)
+	// log.Println("cache get ",key)
 	cache_path := cache.genCachePath(key)
 	return cache.getByPath(cache_path)
 }

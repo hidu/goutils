@@ -1,12 +1,11 @@
 package object
 
-/**
-*toolkit for the interface{}
+/*
+ * toolkit for the interface{}
  */
 import (
 	"fmt"
 	"log"
-	os_path "path"
 	"reflect"
 	"strconv"
 	"strings"
@@ -71,7 +70,7 @@ func (obj *Object) GetInterfaceSlice(path interface{}, def ...[]interface{}) (va
 }
 
 /*
-*读取指定项的值
+ * 读取指定项的值
  */
 func (obj *Object) GetString(path interface{}, def ...string) (val string, has bool) {
 	tmp, has := obj.GetInterface(path)
@@ -180,13 +179,13 @@ func (obj *Object) GetBool(path interface{}) bool {
 	return false
 }
 
-/**
-*quick get the val from a interface
+/*
+ * quick get the val from a interface
  */
 func InterfaceWalk(obj interface{}, path interface{}) (val interface{}, has bool) {
 	path_orign := fmt.Sprint(path)
 	path_str := strings.TrimSpace(os_path.Clean(path_orign))
-	//    fmt.Println("path:",path_str)
+	// fmt.Println("path:",path_str)
 	if path_str == "/" || path_str == "." {
 		return obj, true
 	}

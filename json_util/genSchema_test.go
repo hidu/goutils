@@ -2,9 +2,9 @@ package json_util
 
 import (
 	"encoding/json"
+	// "fmt"
 	"testing"
 
-	//	"fmt"
 	"github.com/bmizerany/assert"
 	"github.com/xeipuuv/gojsonschema"
 )
@@ -35,7 +35,7 @@ func TestGenJsonSchema(t *testing.T) {
 
 	_, err = json.MarshalIndent(schema, "", "  ")
 	assert.Equal(t, err, nil)
-	//	fmt.Println(string(bs))
+	// fmt.Println(string(bs))
 
 	goSchema, err := gojsonschema.NewSchema(gojsonschema.NewGoLoader(schema))
 	assert.Equal(t, err, nil)

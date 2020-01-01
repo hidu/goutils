@@ -2,9 +2,8 @@ package html_util
 
 import (
 	"fmt"
-	//    "github.com/bmizerany/assert"
 	"testing"
-	//    "reflect"
+	// "github.com/bmizerany/assert"
 )
 
 var html_print bool = false
@@ -21,7 +20,7 @@ func TestHtml_input_text(t *testing.T) {
 	if html_print {
 		fmt.Println(sele)
 	}
-	//    fmt.Println("type:",c.Kind())
+	// fmt.Println("type:",c.Kind())
 	link := Html_link("http://www.baidu.com", "baidu-百度")
 	if html_print {
 		fmt.Println(link)

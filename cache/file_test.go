@@ -3,7 +3,6 @@ package cache
 import (
 	"os"
 	"testing"
-	//    "fmt"
 )
 
 func Test_fileCache(t *testing.T) {

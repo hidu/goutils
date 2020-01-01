@@ -1,5 +1,5 @@
-/**
-*fix json data with jsonschema
+/*
+ * fix json data with jsonschema
  */
 package json_util
 

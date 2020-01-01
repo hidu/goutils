@@ -1,8 +1,8 @@
 package object
 
 import (
-	//      "fmt"
 	"encoding/json"
+	// "fmt"
 	"testing"
 
 	"github.com/bmizerany/assert"
@@ -37,7 +37,7 @@ func TestGetVal(t *testing.T) {
 			}
 		}
 	}
-	//////////////////////////////////////////////////
+	// ////////////////////////////////////////////////
 	cases1 := make(map[string]interface{})
 	cases1["b"] = []int{1, 2}
 	cases1["e"] = []int{}

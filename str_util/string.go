@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-/**
-* parse str
-    style='width:1' class="hello" checked=on
-  as
-  map[style:width:1 class:hello checked:on]
-*/
+/*
+ * parse str
+ * style='width:1' class="hello" checked=on
+ * as
+ * map[style:width:1 class:hello checked:on]
+ */
 func StringToMap(str string) (data map[string]string) {
 	re := regexp.MustCompile(`\s*([\w-]+)\s*=\s*(['"]?)(.*)`)
 	data = make(map[string]string)
