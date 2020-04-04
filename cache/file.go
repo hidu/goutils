@@ -18,27 +18,27 @@ import (
 )
 
 type FileCache struct {
-	data_dir    string
-	gc_interval int64
+	dataDir    string
+	gcInterval int64
 	Cache
-	mu sync.Mutex
+	mu sync.RWMutex
 }
 
 func NewFileCache(data_dir string) *FileCache {
-	cache := &FileCache{data_dir: data_dir, gc_interval: 3600}
+	cache := &FileCache{dataDir: data_dir, gcInterval: 3600}
 	return cache
 }
 func (cache *FileCache) Set(key string, data []byte, life int64) (suc bool) {
 	// log.Println("cache set ",key,data)
 	defer cache.mu.Unlock()
-	cache_path := cache.genCachePath(key)
+	cachePath := cache.genCachePath(key)
 	cache.mu.Lock()
-	f, err := os.OpenFile(cache_path, os.O_CREATE|os.O_RDWR, 0644)
+	f, err := os.OpenFile(cachePath, os.O_CREATE|os.O_RDWR, 0644)
 	defer f.Close()
 	if err != nil {
-		p_dir := path.Dir(cache_path)
+		p_dir := path.Dir(cachePath)
 		os.MkdirAll(p_dir, 0755)
-		f, err = os.OpenFile(cache_path, os.O_CREATE|os.O_RDWR, 0644)
+		f, err = os.OpenFile(cachePath, os.O_CREATE|os.O_RDWR, 0644)
 		defer f.Close()
 	}
 	var bf bytes.Buffer
@@ -70,7 +70,7 @@ func (cache *FileCache) Delete(key string) bool {
 }
 
 func (cache *FileCache) DeleteAll() bool {
-	err := os.RemoveAll(cache.data_dir)
+	err := os.RemoveAll(cache.dataDir)
 	if err != nil {
 		log.Println("delete all file cache err:", err)
 	}
@@ -81,41 +81,42 @@ func (cache *FileCache) genCachePath(key string) string {
 	h := md5.New()
 	h.Write([]byte(key))
 	md5_str := hex.EncodeToString(h.Sum(nil))
-	file_path := cache.data_dir + "/" + string(md5_str[:3]) + "/" + md5_str
+	file_path := cache.dataDir + "/" + string(md5_str[:3]) + "/" + md5_str
 	return file_path
 }
 
 func (cache *FileCache) getByPath(file_path string) (has bool, data []byte) {
-	defer cache.mu.Unlock()
-	cache.mu.Lock()
+	defer cache.mu.RUnlock()
+	cache.mu.RLock()
+
 	f, err := os.Open(file_path)
 	defer f.Close()
 	if err != nil {
 		return
 	}
-	data_bf, err1 := ioutil.ReadAll(f)
+	bf, err1 := ioutil.ReadAll(f)
 	if err1 != nil {
 		log.Println("read cache file failed:", file_path, err1.Error())
 		return
 	}
-	dec := gob.NewDecoder(bytes.NewBuffer(data_bf))
-	var cache_data Data
-	err = dec.Decode(&cache_data)
+	dec := gob.NewDecoder(bytes.NewBuffer(bf))
+	var raw Data
+	err = dec.Decode(&raw)
 	if err != nil {
 		return
 	}
-	if time.Now().Unix()-cache_data.Life > cache_data.CreateTime {
-		return false, cache_data.Data
+	if time.Now().Unix()-raw.Life > raw.CreateTime {
+		return false, raw.Data
 	}
-	return true, cache_data.Data
+	return true, raw.Data
 }
 
 func (cache *FileCache) GC() {
-	info, err := os.Stat(cache.data_dir)
+	info, err := os.Stat(cache.dataDir)
 	if err != nil || !info.IsDir() {
 		return
 	}
-	filepath.Walk(cache.data_dir, func(file_path string, info os.FileInfo, err error) error {
+	filepath.Walk(cache.dataDir, func(file_path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			has, data := cache.getByPath(file_path)
 			if has || len(data) > 0 {

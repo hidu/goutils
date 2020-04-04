@@ -1,37 +1,57 @@
 package html_util
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"regexp"
+	"sort"
 
 	"github.com/hidu/goutils/str_util"
 )
 
-func Html_input_tag(tagType string, name string, value string, other_params ...interface{}) (html string) {
+func InputTag(tagType string, name string, value string, otherParams ...interface{}) (html string) {
 	params := make(map[string]string)
 	if len(name) > 0 {
 		params["name"] = name
 	}
 	params["type"] = tagType
 	params["value"] = value
-	params = params_merge(params, other_params)
-	html = "<input " + paramsAsString(params) + "/>"
-	return
+	params = paramsMerge(params, otherParams)
+	var buf bytes.Buffer
+	buf.WriteString("<input")
+	buf.Write(paramsAsBytes(params))
+	buf.WriteString("/>")
+	return buf.String()
 }
 
-func paramsAsString(more_params ...interface{}) string {
+func paramsAsBytes(moreParams ...interface{}) []byte {
 	params := make(map[string]string)
-	params = params_merge(params, more_params)
-	html := ""
-	for k, v := range params {
-		html += " " + k + `="` + template.HTMLEscapeString(v) + `"`
+	params = paramsMerge(params, moreParams)
+	var keys []string
+	for k, _ := range params {
+		keys = append(keys, k)
 	}
-	return html
+	// 排序，保证输出的属性字段是固定顺序的
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
+	var buf bytes.Buffer
+
+	for _, key := range keys {
+		val := params[key]
+
+		buf.WriteString(" ")
+		buf.WriteString(key)
+		buf.WriteString(`="`)
+		buf.WriteString(template.HTMLEscapeString(val))
+		buf.WriteString(`"`)
+	}
+	return buf.Bytes()
 }
 
-func params_merge(params map[string]string, more_params []interface{}) map[string]string {
-	for _, param := range more_params {
+func paramsMerge(params map[string]string, moreParams []interface{}) map[string]string {
+	for _, param := range moreParams {
 		switch param.(type) {
 		case map[string]string:
 			for k, v := range param.(map[string]string) {
@@ -42,119 +62,152 @@ func params_merge(params map[string]string, more_params []interface{}) map[strin
 			for k, v := range _params {
 				params[k] = v
 			}
+		default:
+			panic(fmt.Sprintf("param type not supported: %T:%v", param, param))
 		}
 	}
 	return params
 }
 
-func Html_input_text(name string, value string, other_params ...interface{}) string {
-	return Html_input_tag("text", name, value, other_params...)
+func InputText(name string, value string, params ...interface{}) string {
+	return InputTag("text", name, value, params...)
 }
 
-func Html_input_hidden(name string, value string, other_params ...interface{}) string {
-	return Html_input_tag("hidden", name, value, other_params...)
+func InputHidden(name string, value string, params ...interface{}) string {
+	return InputTag("hidden", name, value, params...)
 }
-func Html_input_password(name string, value string, other_params ...interface{}) string {
-	return Html_input_tag("password", name, value, other_params...)
+func InputPassword(name string, value string, params ...interface{}) string {
+	return InputTag("password", name, value, params...)
 }
-func Html_input_email(name string, value string, other_params ...interface{}) string {
-	return Html_input_tag("email", name, value, other_params...)
+func InputEmail(name string, value string, params ...interface{}) string {
+	return InputTag("email", name, value, params...)
 }
-func Html_input_url(name string, value string, other_params ...interface{}) string {
-	return Html_input_tag("url", name, value, other_params...)
+func InputURL(name string, value string, params ...interface{}) string {
+	return InputTag("url", name, value, params...)
 }
-func Html_input_search(name string, value string, other_params ...interface{}) string {
-	return Html_input_tag("search", name, value, other_params...)
+func InputSearch(name string, value string, params ...interface{}) string {
+	return InputTag("search", name, value, params...)
 }
-func Html_input_file(name string, value string, other_params ...interface{}) string {
-	return Html_input_tag("file", name, value, other_params...)
+func InputFile(name string, value string, params ...interface{}) string {
+	return InputTag("file", name, value, params...)
 }
-func Html_input_submit(value string, other_params ...interface{}) string {
-	return Html_input_tag("submit", "", value, other_params...)
+func InputSubmit(value string, params ...interface{}) string {
+	return InputTag("submit", "", value, params...)
 }
-func Html_input_reset(value string, other_params ...interface{}) string {
-	return Html_input_tag("reset", "", value, other_params...)
+func InputReset(value string, params ...interface{}) string {
+	return InputTag("reset", "", value, params...)
 }
 
-func Html_link(url string, text string, more_params ...interface{}) string {
+func Link(url string, text string, moreParams ...interface{}) string {
 	params := make(map[string]string)
 	params["href"] = url
 	params["title"] = text
-	html := "<a " + paramsAsString(params_merge(params, more_params)) + ">" + template.HTMLEscapeString(text) + "</a>"
-	return html
+
+	var buf bytes.Buffer
+	buf.WriteString("<a")
+	buf.Write(paramsAsBytes(paramsMerge(params, moreParams)))
+	buf.WriteString(">")
+	buf.WriteString(template.HTMLEscapeString(text))
+	buf.WriteString("</a>")
+
+	return buf.String()
 }
 
-func Html_checkBox(name string, value string, label string, isChecked bool, other_params ...interface{}) string {
-	params := make(map[string]string)
+func CheckBox(name string, value string, label string, isChecked bool, params ...interface{}) string {
+	allParams := make(map[string]string)
 	if isChecked {
-		params["checked"] = "checked"
+		allParams["checked"] = "checked"
 	}
-	params = params_merge(params, other_params)
-	html := "<label>" + Html_input_tag("checkbox", name, value, params) + template.HTMLEscapeString(label) + "</label>"
+	allParams = paramsMerge(allParams, params)
+	html := "<label>" + InputTag("checkbox", name, value, allParams) + template.HTMLEscapeString(label) + "</label>"
 	return html
 }
 
-func Html_datalist(id string, values []string) string {
-	html := "<datalist id='" + id + "'>"
+func DataList(id string, values []string) string {
+	var buf bytes.Buffer
+	buf.WriteString("<datalist id='")
+	buf.WriteString(template.HTMLEscapeString(id))
+	buf.WriteString("'>")
+
 	for _, v := range values {
-		html += "<option value='" + template.HTMLEscapeString(v) + "'>"
+		buf.WriteString("<option value='")
+		buf.WriteString(template.HTMLEscapeString(v))
+		buf.WriteString("'>")
 	}
-	html += "</datalist>"
-	return html
+	buf.WriteString("</datalist>")
+	return buf.String()
 }
 
-func Html_textArea(name string, value string, more_params ...interface{}) string {
-	params := make(map[string]string)
-	params["name"] = name
-	params["value"] = value
-	html := "<textarea" + paramsAsString(params_merge(params, more_params)) + ">" + template.HTMLEscapeString(value) + "</textarea>"
-	return html
+func TextArea(name string, value string, params ...interface{}) string {
+	allParams := make(map[string]string)
+	allParams["name"] = name
+	allParams["value"] = value
+
+	var buf bytes.Buffer
+	buf.WriteString("<textarea")
+	buf.Write(paramsAsBytes(paramsMerge(allParams, params)))
+	buf.WriteString(">")
+	buf.WriteString(template.HTMLEscapeString(value))
+	buf.WriteString("</textarea>")
+
+	return buf.String()
 }
 
-type Html_Options struct {
-	Items []*html_option
+type Options struct {
+	Items []*htmlOption
 }
 
-type html_option struct {
-	Name    interface{}
+type htmlOption struct {
 	Value   interface{}
+	Txt     string
 	Checked bool
 	Params  map[string]string
 }
 
-func NewHtml_Options() *Html_Options {
-	return new(Html_Options)
+func NewOptions() *Options {
+	return new(Options)
 }
 
-func (options *Html_Options) AddOption(name interface{}, value interface{}, checked bool) {
-	option := new(html_option)
-	option.Name = name
+func (options *Options) AddOption(txt string, value interface{}, checked bool) {
+	option := new(htmlOption)
+	option.Txt = txt
 	option.Value = value
 	option.Checked = checked
 	options.Items = append(options.Items, option)
 }
 
-func Html_select(name string, options *Html_Options, other_params ...interface{}) string {
-	params := make(map[string]string)
-	params["name"] = name
-	html := "<select" + paramsAsString(params_merge(params, other_params)) + ">\n"
+func Select(name string, options *Options, params ...interface{}) string {
+	allParams := make(map[string]string)
+	allParams["name"] = name
+
+	var buf bytes.Buffer
+	buf.WriteString("<select")
+	buf.Write(paramsAsBytes(paramsMerge(allParams, params)))
+	buf.WriteString(">\n")
+
 	for _, option := range options.Items {
-		option_fmt := "<option value='%s'%s>%s</option>\n"
-		select_str := ""
+		buf.WriteString("<option value='")
+
+		value := template.HTMLEscapeString(fmt.Sprint(option.Value))
+		buf.WriteString(value)
+		buf.WriteString("'")
 		if option.Checked {
-			select_str = " selected='selected'"
+			buf.WriteString(" selected='selected'")
 		}
-		name := fmt.Sprintf("%s", option.Name)
-		value := fmt.Sprintf("%s", option.Value)
-		option_str := fmt.Sprintf(option_fmt, template.HTMLEscapeString(name), select_str, template.HTMLEscapeString(value))
-		html += option_str
+		if len(option.Params) > 0 {
+			buf.Write(paramsAsBytes(option.Params))
+		}
+		buf.WriteString(">")
+		buf.WriteString(template.HTMLEscapeString(option.Txt))
+		buf.WriteString("</option>\n")
 	}
-	html += "</select>"
-	return html
+	buf.WriteString("</select>")
+	return buf.String()
 }
 
-var html_tag_reg *regexp.Regexp = regexp.MustCompile(`>\s+<`)
+var htmlTagReg = regexp.MustCompile(`>\s+<`)
 
-func Html_reduceSpace(html string) string {
-	return html_tag_reg.ReplaceAllString(html, "><")
+// ReduceHTMLSpace 去除html tag 间的空格字符
+func ReduceHTMLSpace(html string) string {
+	return htmlTagReg.ReplaceAllString(html, "><")
 }

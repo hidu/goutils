@@ -48,16 +48,16 @@ func FilePutContents(file_path string, data []byte, def ...int) error {
 	return nil
 }
 
-func FileExists(file_path string) bool {
-	_, err := os.Stat(file_path)
+func FileExists(filePath string) bool {
+	_, err := os.Stat(filePath)
 	if err == nil {
 		return true
 	}
 	return os.IsExist(err)
 }
 
-func FileMd5(file_path string) (string, error) {
-	file, err := os.Open(file_path)
+func FileMd5(filePath string) (string, error) {
+	file, err := os.Open(filePath)
 	if err == nil {
 		h := md5.New()
 		io.Copy(h, file)
